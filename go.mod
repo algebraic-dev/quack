@@ -1,3 +1,3 @@
-module github.com/algebraic-sofia/Quack
+module github.com/algebraic-sofia/quack
 
 go 1.20
