@@ -7,10 +7,11 @@ import (
 
 func main() {
 	event, err := parser.Validate("  21:42 Kill: 1022 2 22: <world> killed Isgalamido by MOD_TRIGGER_HURT")
+	parsed, err := parser.Parse(event)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(event)
+	fmt.Println(parsed)
 }
