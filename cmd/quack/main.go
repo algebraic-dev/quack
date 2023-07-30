@@ -2,16 +2,45 @@ package main
 
 import (
 	"fmt"
+  "encoding/json"
+  "bufio"
+  "os"
 	parser "github.com/algebraic-sofia/quack/internal"
 )
 
 func main() {
-	event, err := parser.Validate("  21:42 Kill: 1022 2 22: <world> killed Isgalamido by MOD_TRIGGER_HURT")
-	parsed, err := parser.Parse(event)
 
-	if err != nil {
-		panic(err)
-	}
+  scanner := bufio.NewScanner(os.Stdin)
 
-	fmt.Println(parsed)
+  var events []parser.Event
+
+  for scanner.Scan() {
+    parsed, err := parser.Validate(scanner.Text())
+
+    if err != nil {
+      continue
+    }
+
+    result, err := parser.Parse(parsed)
+
+    if err != nil {
+      panic(err)
+    }
+
+    events = append(events, result)
+  }
+
+  if err := scanner.Err(); err != nil {
+      fmt.Fprintln(os.Stderr, "reading standard input:", err)
+  }
+
+	analytics := parser.CollectData(events)
+
+  bt, err := json.MarshalIndent(analytics, "", "   ")
+
+  if err != nil {
+    panic(err)
+  }
+
+  fmt.Println(string(bt))
 }
