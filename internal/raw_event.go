@@ -3,6 +3,7 @@
 package internal
 
 import (
+	"fmt"
 	"errors"
 	"regexp"
 	"strconv"
@@ -24,15 +25,15 @@ type RawEvent struct {
 }
 
 // The regex for parsing a single event in the log.
-var eventRegex = regexp.MustCompile(`\s*(\d+):(\d+)\s([a-zA-Z]+):\s*([^\n]*)$`)
+var eventRegex = regexp.MustCompile(`\s*(\d+):(\d+)\s([a-zA-Z]+):\s*([^\n]*)`)
 
 // This function validates a single event and returns an RawEvent struct. It's a first pass in order to
 // validate the log file and get some events without too many details. 
 func Validate(log string) (RawEvent, error) {
 	matches := eventRegex.FindStringSubmatch(log)
 
-	if eventRegex.NumSubexp() != 4 {
-		return RawEvent {}, errors.New("invalid event")
+	if len(matches) != 5 {
+		return RawEvent {}, errors.New(fmt.Sprintf("invalid event: '%s'", log))
 	}
 
 	hour, _ := strconv.ParseInt(matches[1], 10, 32)

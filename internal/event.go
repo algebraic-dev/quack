@@ -11,6 +11,7 @@ const (
 	Kill EventType = iota
 	InitGame
 	ShutdownGame 
+	ClientUserinfoChanged
 	Irrelevant
 )
 
@@ -47,6 +48,13 @@ func (e IrrelevantEvent) GetEventType() EventType {
 	return Irrelevant
 }
 
+type ClientUserinfoChangedEvent struct { 
+	Player string
+}
+
+func (e ClientUserinfoChangedEvent) GetEventType() EventType {
+	return Irrelevant
+}
 
 func parseKillEvent(description string) (KillEvent, error) {
 	words := strings.Split(description, " ")
@@ -80,6 +88,19 @@ func parseKillEvent(description string) (KillEvent, error) {
 	return event, nil
 }
 
+func parseClientUserinfoChangedEvent(description string) (ClientUserinfoChangedEvent, error) {
+	words := strings.Split(description, "\\")
+
+	if len(words) < 2 {
+		return ClientUserinfoChangedEvent {}, errors.New("invalid client userinfo changed event")
+	}
+
+	event := ClientUserinfoChangedEvent {
+		Player: words[1],
+	}
+
+	return event, nil
+}
 
 // This is the main function of the module. It translates a raw event into a event that implements
 // the Event interface.
@@ -91,6 +112,8 @@ func Parse(raw RawEvent) (Event, error) {
 			return InitGameEvent {}, nil
 		case "ShutdownGame":
 			return ShutdownGameEvent {}, nil
+		case "ClientUserinfoChanged":
+			return parseClientUserinfoChangedEvent(raw.Description)
 		default:
 			return IrrelevantEvent {}, nil
 	}
