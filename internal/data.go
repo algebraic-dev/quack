@@ -80,15 +80,15 @@ func CollectData(logs []Event) []MatchAnalytics {
 	first := true
 
 	for _, event := range logs {
-		switch t := event.(type) {
-			case ClientUserinfoChangedEvent: onClientUserinfoChanged(t, &analytics)
-			case KillEvent: onKill(t, &analytics)
+		switch event := event.(type) {
+			case ClientUserinfoChangedEvent: onClientUserinfoChanged(event, &analytics)
+			case KillEvent: onKill(event, &analytics)
 			case InitGameEvent:
 				if !first {
 					result = append(result, analytics)
 				}
 				first = false
-				onInitGame(t, &analytics)
+				onInitGame(event, &analytics)
 			default:
 				continue
 		}
